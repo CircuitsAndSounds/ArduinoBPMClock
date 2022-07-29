@@ -38,6 +38,8 @@ unsigned long previousTimeDiv4 = 0;        // will store last time LED was updat
 unsigned long previousTimeDiv8 = 0;        // will store last time LED was updated
 unsigned long previousTimeDiv16 = 0;        // will store last time LED was updated
 
+unsigned long counter = 0;        // will store last time LED was updated
+
 const int clockLed = 7;
 const int clockLedDiv2 = 8;
 const int clockLedDiv4 = 9;
@@ -59,7 +61,7 @@ int prog = 0;
 TM1637 tm(4, 5);
 
 void setup() {
-  
+
   tm.begin();
   tm.setBrightness(4);
 
@@ -70,7 +72,7 @@ void setup() {
   pinMode(clockLedDiv8, OUTPUT);
   pinMode(clockLedDiv16, OUTPUT);
 
-//  Serial.begin(9600);
+  //  Serial.begin(9600);
 }
 
 void loop() {
@@ -248,140 +250,194 @@ void clockOut() {
   bpmDelay = (msPerMin / BPM) / 2;
 
 
-  switch (prog) {
+  //  switch (prog) {
+  //
+  //    case 0:
+  //      bpmDelayDiv2 = bpmDelay * 2;
+  //      bpmDelayDiv4 = bpmDelay * 4;
+  //      bpmDelayDiv8 = bpmDelay * 8;
+  //      bpmDelayDiv16 = bpmDelay * 16;
+  //      break;
+  //
+  //    case 1:
+  //      bpmDelayDiv2 = bpmDelay / 2;
+  //      bpmDelayDiv4 = bpmDelay / 4;
+  //      bpmDelayDiv8 = bpmDelay / 8;
+  //      bpmDelayDiv16 = bpmDelay / 16;
+  //      break;
+  //
+  //
+  //    case 2:
+  //      bpmDelayDiv2 = bpmDelay * 3;
+  //      bpmDelayDiv4 = bpmDelay * 5;
+  //      bpmDelayDiv8 = bpmDelay * 7;
+  //      bpmDelayDiv16 = bpmDelay * 9;
+  //      break;
+  //
+  //
+  //    case 3:
+  //      bpmDelayDiv2 = bpmDelay / 3;
+  //      bpmDelayDiv4 = bpmDelay / 5;
+  //      bpmDelayDiv8 = bpmDelay / 7;
+  //      bpmDelayDiv16 = bpmDelay / 9;
+  //      break;
+  //
+  //
+  //    default:
+  //      bpmDelayDiv2 = bpmDelay * 2;
+  //      bpmDelayDiv4 = bpmDelay * 4;
+  //      bpmDelayDiv8 = bpmDelay * 8;
+  //      bpmDelayDiv16 = bpmDelay * 16;
+  //      break;
+  //
+  //  }
 
-    case 0:
-      bpmDelayDiv2 = bpmDelay * 2;
-      bpmDelayDiv4 = bpmDelay * 4;
-      bpmDelayDiv8 = bpmDelay * 8;
-      bpmDelayDiv16 = bpmDelay * 16;
-      break;
+  currentTime = millis();
 
-    case 1:
-      bpmDelayDiv2 = bpmDelay / 2;
-      bpmDelayDiv4 = bpmDelay / 4;
-      bpmDelayDiv8 = bpmDelay / 8;
-      bpmDelayDiv16 = bpmDelay / 16;
-      break;
+  if (currentTime - previousTime > bpmDelay) { //MASTER BPM
 
+    counter++;
 
-    case 2:
-      bpmDelayDiv2 = bpmDelay * 3;
-      bpmDelayDiv4 = bpmDelay * 5;
-      bpmDelayDiv8 = bpmDelay * 7;
-      bpmDelayDiv16 = bpmDelay * 9;
-      break;
+    // save the last time you blinked the LED
+    previousTime = currentTime;
 
+    // if the LED is off turn it on and vice-versa:
+    if (clockState == LOW) {
+      clockState = HIGH;
+    }
 
-    case 3:
-      bpmDelayDiv2 = bpmDelay / 3;
-      bpmDelayDiv4 = bpmDelay / 5;
-      bpmDelayDiv8 = bpmDelay / 7;
-      bpmDelayDiv16 = bpmDelay / 9;
-      break;
-
-
-    default:
-      bpmDelayDiv2 = bpmDelay * 2;
-      bpmDelayDiv4 = bpmDelay * 4;
-      bpmDelayDiv8 = bpmDelay * 8;
-      bpmDelayDiv16 = bpmDelay * 16;
-      break;
-
+    else {
+      clockState = LOW;
+    }
+    // set the LED with the clockState of the variable:
+    digitalWrite(clockLed, clockState);
   }
 
-    currentTime = millis();
 
-    if (currentTime - previousTime >= bpmDelay) { //MASTER BPM
 
-      // save the last time you blinked the LED
-      previousTime = currentTime;
 
-      // if the LED is off turn it on and vice-versa:
-      if (clockState == LOW) {
-        clockState = HIGH;
-      }
+  if (counter % 2 == 0) { //BPM DIVIDED BY 2
 
-      else {
-        clockState = LOW;
-      }
-      // set the LED with the clockState of the variable:
-      digitalWrite(clockLed, clockState);
+    // if the LED is off turn it on and vice-versa:
+    if (clockStateDiv2 == LOW) {
+      clockStateDiv2 = HIGH;
     }
 
-
-    if (currentTime - previousTimeDiv2 >= bpmDelayDiv2) { //BPM DIVIDED BY 2
-
-      // save the last time you blinked the LED
-      previousTimeDiv2 = currentTime;
-
-      // if the LED is off turn it on and vice-versa:
-      if (clockStateDiv2 == LOW) {
-        clockStateDiv2 = HIGH;
-      }
-
-      else {
-        clockStateDiv2 = LOW;
-      }
-      // set the LED with the clockState of the variable:
-      digitalWrite(clockLedDiv2, clockStateDiv2);
+    else {
+      clockStateDiv2 = LOW;
     }
 
+    // set the LED with the clockState of the variable:
+    digitalWrite(clockLedDiv2, clockStateDiv2);
+  }
 
+  if (counter % 4 == 0) { //BPM DIVIDED BY 4
 
-    if (currentTime - previousTimeDiv4 >= bpmDelayDiv4) { //BPM DIVIDED BY 4
-
-      // save the last time you blinked the LED
-      previousTimeDiv4 = currentTime;
-
-      // if the LED is off turn it on and vice-versa:
-      if (clockStateDiv4 == LOW) {
-        clockStateDiv4 = HIGH;
-      }
-
-      else {
-        clockStateDiv4 = LOW;
-      }
-      // set the LED with the clockState of the variable:
-      digitalWrite(clockLedDiv4, clockStateDiv4);
+    // if the LED is off turn it on and vice-versa:
+    if (clockStateDiv4 == LOW) {
+      clockStateDiv4 = HIGH;
     }
 
-
-
-    if (currentTime - previousTimeDiv8 >= bpmDelayDiv8) { //BPM DIVIDED BY 8
-
-      // save the last time you blinked the LED
-      previousTimeDiv8 = currentTime;
-
-      // if the LED is off turn it on and vice-versa:
-      if (clockStateDiv8 == LOW) {
-        clockStateDiv8 = HIGH;
-      }
-
-      else {
-        clockStateDiv8 = LOW;
-      }
-      // set the LED with the clockState of the variable:
-      digitalWrite(clockLedDiv8, clockStateDiv8);
+    else {
+      clockStateDiv4 = LOW;
     }
 
+    // set the LED with the clockState of the variable:
+    digitalWrite(clockLedDiv4, clockStateDiv4);
+  }
 
+  if (counter % 8 == 0) { //BPM DIVIDED BY 8
 
-    if (currentTime - previousTimeDiv16 >= bpmDelayDiv16) { //BPM DIVIDED BY 16
-
-      // save the last time you blinked the LED
-      previousTimeDiv16 = currentTime;
-
-      // if the LED is off turn it on and vice-versa:
-      if (clockStateDiv16 == LOW) {
-        clockStateDiv16 = HIGH;
-      }
-
-      else {
-        clockStateDiv16 = LOW;
-      }
-      // set the LED with the clockState of the variable:
-      digitalWrite(clockLedDiv16, clockStateDiv16);
+    // if the LED is off turn it on and vice-versa:
+    if (clockStateDiv8 == LOW) {
+      clockStateDiv8 = HIGH;
     }
-  
+
+    else {
+      clockStateDiv8 = LOW;
+    }
+
+    // set the LED with the clockState of the variable:
+    digitalWrite(clockLedDiv8, clockStateDiv8);
+  }
+
+
+  //    if (currentTime - previousTimeDiv2 > bpmDelayDiv2) { //BPM DIVIDED BY 2
+  //
+  //      // save the last time you blinked the LED
+  //      previousTimeDiv2 = currentTime;
+  //
+  //      // if the LED is off turn it on and vice-versa:
+  //      if (clockStateDiv2 == LOW) {
+  //        clockStateDiv2 = HIGH;
+  //      }
+  //
+  //      else {
+  //        clockStateDiv2 = LOW;
+  //      }
+  //      // set the LED with the clockState of the variable:
+  //      digitalWrite(clockLedDiv2, clockStateDiv2);
+  //    }
+  //
+  //
+  //
+  //    if (currentTime - previousTimeDiv4 > bpmDelayDiv4) { //BPM DIVIDED BY 4
+  //
+  //      // save the last time you blinked the LED
+  //      previousTimeDiv4 = currentTime;
+  //
+  //      // if the LED is off turn it on and vice-versa:
+  //      if (clockStateDiv4 == LOW) {
+  //        clockStateDiv4 = HIGH;
+  //      }
+  //
+  //      else {
+  //        clockStateDiv4 = LOW;
+  //      }
+  //      // set the LED with the clockState of the variable:
+  //      digitalWrite(clockLedDiv4, clockStateDiv4);
+  //    }
+  //
+  //
+  //
+  //    if (currentTime - previousTimeDiv8 > bpmDelayDiv8) { //BPM DIVIDED BY 8
+  //
+  //      // save the last time you blinked the LED
+  //      previousTimeDiv8 = currentTime;
+  //
+  //      // if the LED is off turn it on and vice-versa:
+  //      if (clockStateDiv8 == LOW) {
+  //        clockStateDiv8 = HIGH;
+  //      }
+  //
+  //      else {
+  //        clockStateDiv8 = LOW;
+  //      }
+  //      // set the LED with the clockState of the variable:
+  //      digitalWrite(clockLedDiv8, clockStateDiv8);
+  //    }
+  //
+  //
+  //
+  //    if (currentTime - previousTimeDiv16 > bpmDelayDiv16) { //BPM DIVIDED BY 16
+  //
+  //      // save the last time you blinked the LED
+  //      previousTimeDiv16 = currentTime;
+  //
+  //      // if the LED is off turn it on and vice-versa:
+  //      if (clockStateDiv16 == LOW) {
+  //        clockStateDiv16 = HIGH;
+  //      }
+  //
+  //      else {
+  //        clockStateDiv16 = LOW;
+  //      }
+  //      // set the LED with the clockState of the variable:
+  //      digitalWrite(clockLedDiv16, clockStateDiv16);
+  //    }
+
 }
+
+
+
+
